@@ -1,0 +1,289 @@
+{% extends "base_layouts/base_auth.html" %}
+{% block title %}{{ site_name }} | Dashboard{% endblock %}
+{% block content %}
+
+<meta http-equiv="refresh" content="900">
+
+<div class="row">
+    <div class="col-lg-12">
+        <h2 class="page-header page-header-title">Dashboard</h2>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <span style="font-size:18px">Welcome to {{ site_name }}</span>
+        <br/><br/>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Reminder Stats
+            </div>
+            <div class="panel-body">
+                <ul>
+                    <li>My Total Reminders: {{ my_total_reminders_count }} </li>
+                    <li>Total Shared Reminders Shared With Me: {{ my_total_shared_reminders_count }} </li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                Upcoming - My Non-Recurring Reminders (Preview)
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th class="text-center">Type</th>
+                                <th class="text-center">Due Date</th>
+                                <th class="text-center">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if upcoming_my_non_recurring_reminders_list %}
+                            {% for each_upcoming_my_non_recurring_reminder in upcoming_my_non_recurring_reminders_list %}
+                            <tr>
+                                <td>{{ each_upcoming_my_non_recurring_reminder.reminder_title }}</td>
+                                <td class="text-center">{{ each_upcoming_my_non_recurring_reminder.reminder_type }}</td>
+                                <td class="text-center">{{ each_upcoming_my_non_recurring_reminder.reminder_date_end }}</td>
+                                <td class="text-center">
+                                    <a href="/view-reminder/{{ each_upcoming_my_non_recurring_reminder.reminder_uuid }}" class="btn btn-info btn-sm">
+                                        <i class="fa fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    No Upcoming My Non-Recurring Reminders
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                Upcoming - My Recurring Reminders (Preview)
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th class="text-center">Type</th>
+                                <th class="text-center">Next Date</th>
+                                <th class="text-center">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if upcoming_my_recurring_reminders_list %}
+                            {% for each_upcoming_my_recurring_reminder in upcoming_my_recurring_reminders_list %}
+                            <tr>
+                                <td>{{ each_upcoming_my_recurring_reminder.reminder_title }}</td>
+                                <td class="text-center">{{ each_upcoming_my_recurring_reminder.reminder_type }}</td>
+                                <td class="text-center">{{ each_upcoming_my_recurring_reminder.reminder_display_date_next_occurrence }}</td>
+                                <td class="text-center">
+                                    <a href="/view-reminder/{{ each_upcoming_my_recurring_reminder.reminder_uuid }}" class="btn btn-info btn-sm">
+                                        <i class="fa fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    No Upcoming My Recurring Reminders
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-warning" style="border-color: #B8B8D8;">
+            <div class="panel-heading" style="background-color: #EBEBFF; color: #6E6E98; border-color: #B8B8D8;">
+                Upcoming - Non-Recurring Reminders Shared With Me (Preview)
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th class="text-center">Type</th>
+                                <th class="text-center">Owner</th>
+                                <th class="text-center">Due Date</th>
+                                <th class="text-center">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if upcoming_shared_non_recurring_reminders_list %}
+                            {% for reminder, shared, user_reminder_shared_with, user_reminder_owner in upcoming_shared_non_recurring_reminders_list %}
+                            <tr>
+                                <td>{{ reminder.reminder_title }}</td>
+                                <td class="text-center">{{ reminder.reminder_type }}</td>
+                                <td class="text-center">{{ user_reminder_owner.user_username }}</td>
+                                <td class="text-center">{{ reminder.reminder_date_end }}</td>
+                                <td class="text-center">
+                                    <a href="/view-reminder/{{ reminder.reminder_uuid }}" class="btn btn-info btn-sm">
+                                        <i class="fa fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    No Upcoming Non-Recurring Reminders Shared With Me
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-warning" style="border-color: #B8B8D8;">
+            <div class="panel-heading" style="background-color: #EBEBFF; color: #6E6E98; border-color: #B8B8D8;">
+                Upcoming - Recurring Reminders Shared With Me (Preview)
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th class="text-center">Type</th>
+                                <th class="text-center">Owner</th>
+                                <th class="text-center">Next Date</th>
+                                <th class="text-center">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if upcoming_shared_recurring_reminders_list %}
+                            {% for reminder, shared, user_reminder_shared_with, user_reminder_owner in upcoming_shared_recurring_reminders_list %}
+                            <tr>
+                                <td>{{ reminder.reminder_title }}</td>
+                                <td class="text-center">{{ reminder.reminder_type }}</td>
+                                <td class="text-center">{{ user_reminder_owner.user_username }}</td>
+                                <td class="text-center">{{ reminder.reminder_display_date_next_occurrence }}</td>
+                                <td class="text-center">
+                                    <a href="/view-reminder/{{ reminder.reminder_uuid }}" class="btn btn-info btn-sm">
+                                        <i class="fa fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    No Upcoming Recurring Reminders Shared With Me
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                Overdue - My Non-Recurring Reminders (Preview)
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th class="text-center">Type</th>
+                                <th class="text-center">Due Date</th>
+                                <th class="text-center">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if overdue_my_non_recurring_reminders_list %}
+                            {% for each_overdue_my_non_recurring_reminder in overdue_my_non_recurring_reminders_list %}
+                            <tr>
+                                <td>{{ each_overdue_my_non_recurring_reminder.reminder_title }}</td>
+                                <td class="text-center">{{ each_overdue_my_non_recurring_reminder.reminder_type }}</td>
+                                <td class="text-center">{{ each_overdue_my_non_recurring_reminder.reminder_date_end }}</td>
+                                <td class="text-center">
+                                    <a href="/view-reminder/{{ each_overdue_my_non_recurring_reminder.reminder_uuid }}" class="btn btn-info btn-sm">
+                                        <i class="fa fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    No Overdue My Non-Recurring Reminders
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                Overdue - Non-Recurring Reminders Shared With Me (Preview)
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th class="text-center">Type</th>
+                                <th class="text-center">Owner</th>
+                                <th class="text-center">Next Date</th>
+                                <th class="text-center">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if overdue_shared_non_recurring_reminders_list %}
+                            {% for reminder, shared, user_reminder_shared_with, user_reminder_owner in overdue_shared_non_recurring_reminders_list %}
+                            <tr>
+                                <td>{{ reminder.reminder_title }}</td>
+                                <td class="text-center">{{ reminder.reminder_type }}</td>
+                                <td class="text-center">{{ user_reminder_owner.user_username }}</td>
+                                <td class="text-center">{{ reminder.reminder_date_end }}</td>
+                                <td class="text-center">
+                                    <a href="/view-reminder/{{ reminder.reminder_uuid }}" class="btn btn-info btn-sm">
+                                        <i class="fa fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    No Overdue Shared Non-Recurring Reminders
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+{% endblock %}

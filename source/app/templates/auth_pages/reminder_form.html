@@ -1,0 +1,376 @@
+{% extends "base_layouts/base_auth.html" %}
+{% block title %}{{ site_name }} | {{ "Update Reminder" if reminder else "Create Reminder" }}{% endblock %}
+{% block content %}
+
+<style>
+    .readonly-background {
+        background-color: #f7fbfb !important;
+    }
+
+    .marked-complete {
+        text-decoration: line-through;
+        background-color: #e1e1e1 !important;
+    }
+
+    .marked-skipped {
+        background-color: #d8d0be !important;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h2 class="page-header page-header-title">{{ "Update Reminder" if reminder else "Create Reminder" }}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                {{ "Update Reminder" if edit_mode else "Create Reminder" }}
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    {% if msg_error is not none %}
+                    <div class="form-group">
+                        <div align="center" style="color:#FF3333">{{ msg_error }}</div>
+                    </div>
+                    {% endif %}
+                    <div class="col-lg-6">
+                        <form id="form_reminder" name="form_reminder" role="form" method="post" 
+                            action="{{ '/update-reminder/' + reminder.reminder_uuid if edit_mode else '/create-reminder' }}">
+
+                            <!-- Reminder Title -->
+                            <div class="form-group">
+                                <label class="form-label">Title</label>
+                                <input type="text" name="reminder_title" class="form-control" 
+                                    value="{{ reminder.reminder_title if reminder else '' }}" 
+                                    placeholder="Title" required>
+                            </div>
+
+                            <!-- Reminder Description -->
+                            <div class="form-group">
+                                <label class="form-label">Description (Optional)</label>
+                                <textarea name="reminder_desc" class="form-control" placeholder="Description">{{ reminder.reminder_desc if reminder else '' }}</textarea>
+                            </div>
+
+                            <!-- Reminder Link (Optional) -->
+                            <div class="form-group">
+                                <label class="form-label">Link (Optional)</label>
+                                {% if reminder.reminder_link %}
+                                    <a href="{{ reminder.reminder_link }}" target="_blank">
+                                        <p class="form-control-static" style="font-size: 16px;">{{ reminder.reminder_link }}</p>
+                                    </a>
+                                {% else %}
+                                    <p class="form-control-static">N/A</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Reminder Type -->
+                            <div class="form-group">
+                                <label class="form-label">Type</label>
+                                <select name="reminder_type" class="form-control" required>
+                                    {% for type in ["Task - Personal", "Task - Home", "Task - Work", "Task - Other", "Event", "Appointment", "Meeting", "Document Validity", "Travel", "Custom Renewal", "Other"] %}
+                                        <option value="{{ type }}" {% if reminder and reminder.reminder_type == type %}selected{% endif %}>{{ type }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Reminder Occurence / Recurrence | Start -->
+                            <!-- Reminder Recurrence Type -->
+                            <div class="form-group">
+                                <label>Recurrence</label>
+                                <select name="reminder_recurrence_type" id="reminder_recurrence_type" class="form-control">
+                                    {% set rtype = reminder.reminder_recurrence_type if reminder else 'NONE' %}
+                                    <option value="NONE" {% if rtype == 'NONE' %}selected{% endif %}>Does not repeat</option>
+                                    <option value="DAILY" {% if rtype == 'DAILY' %}selected{% endif %}>Daily</option>
+                                    <option value="WEEKLY" {% if rtype == 'WEEKLY' %}selected{% endif %}>Weekly</option>
+                                    <option value="MONTHLY" {% if rtype == 'MONTHLY' %}selected{% endif %}>Monthly</option>
+                                    <option value="YEARLY" {% if rtype == 'YEARLY' %}selected{% endif %}>Yearly</option>
+                                </select>
+                            </div>
+
+
+                            <!-- Start Date -->
+                            <div class="form-group">
+                                <label class="form-label" id="reminder_date_start_label">Start Date</label>
+                                <input class="form-control" id="reminder_date_start" name="reminder_date_start" type="date" 
+                                    value="{{ reminder.reminder_date_start if reminder else '' }}">
+                            </div>
+
+                            <!-- End Date -->
+                            <div class="form-group">
+                                <label class="form-label" id="reminder_date_end_label">Due Date / End Date</label>
+                                <input class="form-control" id="reminder_date_end" name="reminder_date_end" type="date" 
+                                    value="{{ reminder.reminder_date_end if reminder else '' }}" required>
+                            </div>
+                            <!-- Reminder Occurence / Recurrence | End -->
+
+                            <!-- Mark as Completed -->
+                            <div class="form-group">
+                                <label class="form-label">Mark as Completed</label>
+                                <input name="reminder_is_completed" id="reminder_is_completed" type="checkbox" class="checkbox"
+                                    {% if reminder and reminder.reminder_is_completed %}checked{% endif %}>
+                            </div>
+
+                            {% if reminder %}
+                            <!-- Reminder URL Slug -->
+                            <div class="form-group">
+                                <label class="form-label">Share URL</label>
+                                <br/>
+                                <div>
+                                    <a class="btn btn-outline btn-info" style="font-size: 14px;;" href="/share/{{ reminder.reminder_url_slug }}" target="_blank">
+                                        {{ reminder.reminder_url_slug }}
+                                    </a>
+                                    &nbsp;
+                                    <div style="float:right;">
+                                        <button 
+                                            class="btn btn-sm btn-default" 
+                                            onclick="copyToClipboard('{{ reminder.reminder_url_slug }}')">
+                                            <i class="fa fa-copy"></i> Copy
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+
+                            <br/><br/>
+
+                            <!-- Hidden Fields -->
+                            {% if reminder and reminder.reminder_id %}
+                            <input id="reminder_id" name="reminder_id" type="hidden" value="{{ reminder.reminder_id }}">
+                            {% endif %}
+
+                            {% if reminder and reminder.reminder_uuid %}
+                            <input id="reminder_uuid" name="reminder_uuid" type="hidden" value="{{ reminder.reminder_uuid }}">
+                            {% endif %}
+
+                            {% if source_page %}
+                            <input id="source_page" name="source_page" type="hidden" value="{{ source_page }}">
+                            {% endif %}
+
+                            <input name="postback_reminder" type="hidden" value="{{ 'update' if reminder else 'create' }}">
+
+                            <!-- Submit and Reset Buttons -->
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="reset" class="btn btn-secondary">Reset</button>
+
+                            <hr/>
+                        </form>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <!-- Recurrence Preview -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Recurrence Preview:</div>
+                            <div class="panel-body">
+                                <div id="recurrence_preview">
+                                    <i>Reccurence preview will appear here if applicable.</i>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        <!-- Reminder Sharing -->
+                        {% if reminder and reminder.created_by != session_user_system_id %}
+                            <div class="alert alert-info">
+                                Note: Sharing feature is only available to the reminder owner.
+                            </div>
+                        {% elif reminder and reminder.created_by == session_user_system_id %}
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    Share with a user:
+                                </div>
+                                <div class="panel-body">
+                                    <!-- Share Reminder Section -->
+                                    <div>
+                                        <div class="form-group">
+                                            <input type="text" id="share_user_id" name="share_user_id" class="form-control" placeholder="Enter UserID or Email">
+                                        </div>
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-primary" onclick="share_reminder()">Share</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Display shared users -->
+                                    <div id="shared-users">
+                                        {% if reminder and reminder.reminder_shared_with and reminder.reminder_shared_with|length > 0 %}
+                                            <label>Shared with:</label>
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="access-table">User ID</th>
+                                                        <th class="access-table">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for shared_reminder, user, reminder in reminder.reminder_shared_with %}
+                                                        <tr>
+                                                            <td>{{ user.user_username }}</td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-danger btn-xs" onclick="unshare_reminder('{{ shared_reminder.shared_reminder_user_uuid }}')">
+                                                                    <i class="fa fa-times"></i> Remove
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Share Reminder
+function share_reminder() {
+    const share_reminder_uuid = document.getElementById("reminder_uuid").value;
+    const share_user_id = document.getElementById("share_user_id").value;
+
+    if (!share_user_id) {
+        alert("Please enter a UserID or Email address.");
+        return;
+    }
+
+    fetch("/api/reminder/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            share_reminder_uuid : share_reminder_uuid,
+            share_user_id: share_user_id,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(err => console.error("Error:", err));
+}
+
+// Unshare Reminder
+function unshare_reminder(unshare_user_id) {
+    const share_reminder_uuid = document.getElementById("reminder_uuid").value;
+
+    fetch("/api/reminder/unshare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            share_reminder_uuid : share_reminder_uuid,
+            unshare_user_id: unshare_user_id
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(err => console.error("Error:", err));
+}
+</script>
+
+<script>
+// Recurrence Preview
+function updateRecurrencePreview() {
+    const reminder_recurrence_type = document.getElementById("reminder_recurrence_type").value;
+    const reminder_date_start = document.getElementById("reminder_date_start").value;
+    const reminder_date_end = document.getElementById("reminder_date_end").value;
+
+    const payload = {
+        reminder_recurrence_type: reminder_recurrence_type,
+        reminder_date_start: reminder_date_start,
+        reminder_date_end: reminder_date_end
+    };
+
+    fetch("/api/reminder/preview-next-occurrences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        let previewBox = document.getElementById("recurrence_preview");
+        if (data.next_occurrences && data.next_occurrences.length > 0) {
+            previewBox.innerHTML = "<ul>" + data.next_occurrences.map(o => `<li>${o}</li>`).join("") + "</ul>";
+        } else {
+            previewBox.innerHTML = "<i>Not a recurring reminder</i>";
+        }
+    });
+}
+
+// Attach events to trigger preview updates
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("#reminder_recurrence_type, #reminder_date_start, #reminder_date_end")
+    .forEach(el => {
+        el.addEventListener("change", updateRecurrencePreview);
+        el.addEventListener("keyup", updateRecurrencePreview);
+    });
+
+    // Initial load
+    updateRecurrencePreview();
+});
+</script>
+
+<script>
+// Date Mandatory Behavior
+// If reminder recurrence type is "NONE", "Start Date" is optional, "End Date" is mandatory
+// If reminder recurrence type is not "NONE", "Start Date" is mandatory, "End Date" is optional
+function updateDateMandatoryBehavior() {
+    const reminder_recurrence_type = document.getElementById("reminder_recurrence_type");
+    const reminder_date_start = document.getElementById("reminder_date_start");
+    const reminder_date_end = document.getElementById("reminder_date_end");
+    const reminder_date_start_label = document.getElementById("reminder_date_start_label");
+    const reminder_date_end_label = document.getElementById("reminder_date_end_label");
+
+    if (reminder_recurrence_type.value === "NONE") {
+        // Set "Start Date" as optional
+        reminder_date_start.required = false;
+        // Change the label of "Start Date" to indicate it is optional
+        reminder_date_start_label.textContent = "Start Date (Optional)";
+
+        // Set "End Date" as mandatory
+        reminder_date_end.required = true;
+        // Change the label of "End Date" to indicate it is mandatory
+        reminder_date_end_label.textContent = "End Date (Mandatory)";
+    } else {
+        // Set "Start Date" as mandatory
+        reminder_date_start.required = true;
+        // Change the label of "Start Date" to indicate it is mandatory
+        reminder_date_start_label.textContent = "Start Date (Mandatory)";
+
+        // Set "End Date" as optional
+        reminder_date_end.required = false;
+        // Change the label of "End Date" to indicate it is optional
+        reminder_date_end_label.textContent = "End Date (Optional)";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const reminder_recurrence_type = document.getElementById("reminder_recurrence_type");
+
+    reminder_recurrence_type.addEventListener("change", () => {
+        updateDateMandatoryBehavior();
+    });
+
+    // Initial load
+    updateDateMandatoryBehavior();
+})
+</script>
+
+
+{% endblock %}

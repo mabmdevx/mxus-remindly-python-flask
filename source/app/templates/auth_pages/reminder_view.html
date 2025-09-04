@@ -1,0 +1,240 @@
+{% extends "base_layouts/base_auth.html" %}
+{% block title %}{{ site_name }} | View Reminder{% endblock %}
+{% block content %}
+
+<style>
+    .readonly-background {
+        background-color: #f7fbfb !important;
+    }
+
+    .marked-complete {
+        text-decoration: line-through;
+        background-color: #e1e1e1 !important;
+    }
+
+    .marked-skipped {
+        background-color: #d8d0be !important;
+    }
+
+    .share-url-title {
+        text-align: center;
+        font-size: 20px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12"></div>
+    {% if share_url %}
+        <h2 class="page-header page-header-title share-url-title">Reminder {{ reminder.reminder_url_slug if reminder else '' }}</h2>
+    {% else %}
+        <h2 class="page-header page-header-title">View Reminder</h2>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            {% if not share_url %}
+            <div class="panel-heading">
+                View Reminder
+            </div>
+            {% endif %}
+            <div class="panel-body">
+                <div class="row">
+                    <div id="msgdiv"></div>
+                    <div class="col-lg-6">
+
+                        <!-- Reminder Title -->
+                        <div class="form-group">
+                            <label class="form-label">Title</label>
+                            <input type="text" name="title" class="form-control readonly-background" 
+                                value="{{ reminder.reminder_title if reminder.reminder_title else '' }}" readonly>
+                        </div>
+
+                        <!-- Reminder Type -->
+                        <div class="form-group">
+                            <label class="form-label">Reminder Type</label>
+                            <input type="text" name="type" class="form-control readonly-background" 
+                                value="{{ reminder.reminder_type if reminder.reminder_type else '' }}" readonly>
+                        </div>
+
+                        <!-- Reminder Description -->
+                        <div class="form-group">
+                            <label class="form-label">Description (Optional)</label>
+                            <textarea class="form-control readonly-background" rows="4" readonly>{{ reminder.reminder_desc if reminder.reminder_desc else '' }}</textarea>
+                        </div>
+
+                        <!-- Reminder Link -->
+                        <div class="form-group">
+                            <label class="form-label">Link (Optional)</label>
+                            {% if reminder.reminder_link %}
+                                <a href="{{ reminder.reminder_link }}" target="_blank">
+                                    <p class="form-control-static" style="font-size: 16px;">{{ reminder.reminder_link }}</p>
+                                </a>
+                            {% else %}
+                                <p class="form-control-static">N/A</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Reminder Recurrence -->
+                        <div class="form-group">
+                            <label class="form-label">Recurrence</label>
+                            <input id="reminder_recurrence_type" name="reminder_recurrence_type" type="text" class="form-control readonly-background" 
+                                value="{{ reminder.reminder_recurrence_type if reminder.reminder_recurrence_type else '' }}" readonly>
+                        </div>
+
+                        <!-- Reminder Date Start -->
+                        <div class="form-group">
+                            <label class="form-label">Start Date</label>
+                            <input id="reminder_date_start" name="reminder_date_start" type="text" class="form-control readonly-background" 
+                                value="{{ reminder.reminder_date_start if reminder.reminder_date_start else '' }}" readonly>
+                        </div>
+
+                        <!-- Reminder Date End -->
+                        <div class="form-group">
+                            <label class="form-label">End Date</label>
+                            <input id="reminder_date_end" name="reminder_date_end" type="text" class="form-control readonly-background" 
+                                value="{{ reminder.reminder_date_end if reminder.reminder_date_end else '' }}" readonly>
+                        </div>
+
+                        <!-- Reminder Next Occurrence -->
+                        <div class="form-group">
+                            <label class="form-label">Due / Next Date</label>
+                            <input type="text" class="form-control readonly-background" 
+                                value="{{ reminder.reminder_display_date_next_occurrence if reminder.reminder_display_date_next_occurrence else '' }}" readonly>
+                        </div>
+
+                        <!-- Mark as Completed -->
+                        <div class="form-group">
+                            <label class="form-label">Completed?</label>
+                            <input id="reminder_is_completed" name="reminder_is_completed" type="checkbox" class="checkbox"
+                                {% if reminder.reminder_is_completed %}checked{% endif %}>
+                        </div>
+
+                        <!-- Reminder URL Slug -->
+                        <div class="form-group">
+                            <label class="form-label">Share URL</label>
+                            <br/>
+                            <div>
+                                <a class="btn btn-outline btn-info" style="font-size: 14px;;" href="/share/{{ reminder.reminder_url_slug }}" target="_blank">
+                                    {{ reminder.reminder_url_slug }}
+                                </a>
+                                &nbsp;
+                                <div style="float:right;">
+                                    <button 
+                                        class="btn btn-sm btn-default" 
+                                        onclick="copyToClipboard('{{ reminder.reminder_url_slug }}')">
+                                        <i class="fa fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <!-- Recurrence Preview -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Recurrence Preview:</div>
+                            <div class="panel-body">
+                                <div id="recurrence_preview">
+                                    <i>Reccurence preview will appear here if applicable.</i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <br/><br/>
+                        <!-- Hidden Fields -->
+                        {% if reminder and reminder.reminder_id %}
+                        <input id="reminder_id" name="reminder_id" type="hidden" value="{{ reminder.reminder_id }}">
+                        {% endif %}
+
+                        {% if reminder and reminder.reminder_uuid %}
+                        <input id="reminder_uuid" name="reminder_uuid" type="hidden" value="{{ reminder.reminder_uuid }}">
+                        {% endif %}
+
+                        <!-- Close Button -->
+                        {% if not share_url %}
+                            <a href="/dashboard" class="btn btn-default"><i class="fa fa-times"></i> Close</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateRecurrencePreview() {
+    const reminder_recurrence_type = document.getElementById("reminder_recurrence_type").value;
+    const reminder_date_start = document.getElementById("reminder_date_start").value;
+    const reminder_date_end = document.getElementById("reminder_date_end").value;
+
+    const payload = {
+        reminder_recurrence_type: reminder_recurrence_type,
+        reminder_date_start: reminder_date_start,
+        reminder_date_end: reminder_date_end
+    };
+
+    fetch("/api/reminder/preview-next-occurrences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        let previewBox = document.getElementById("recurrence_preview");
+        if (data.next_occurrences && data.next_occurrences.length > 0) {
+            previewBox.innerHTML = "<ul>" + data.next_occurrences.map(o => `<li>${o}</li>`).join("") + "</ul>";
+        } else {
+            previewBox.innerHTML = "<i>Not a recurring reminder</i>";
+        }
+    });
+}
+
+// Attach events to trigger preview updates
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("#reminder_recurrence_type, #reminder_date_start, #reminder_date_end")
+    .forEach(el => {
+        el.addEventListener("change", updateRecurrencePreview);
+        el.addEventListener("keyup", updateRecurrencePreview);
+    });
+
+    // Initial load
+    updateRecurrencePreview();
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const reminder_uuid = document.getElementById("reminder_uuid").value;
+    const reminder_is_completed_checkbox = document.getElementById("reminder_is_completed");
+
+    if (reminder_is_completed_checkbox) {
+        reminder_is_completed_checkbox.addEventListener("change", () => {
+            fetch(`/api/reminder/update-completed`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    reminder_uuid: reminder_uuid, 
+                    reminder_is_completed: reminder_is_completed_checkbox.checked 
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    alert("Error: " + data.message);
+                    reminder_is_completed_checkbox.checked = !reminder_is_completed_checkbox.checked; // revert state on failure
+                }
+            })
+            .catch(err => {
+                alert("Error updating reminder");
+                reminder_is_completed_checkbox.checked = !reminder_is_completed_checkbox.checked;
+            });
+        });
+    }
+});
+</script>
+
+{% endblock %}

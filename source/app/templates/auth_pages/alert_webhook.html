@@ -1,0 +1,55 @@
+{% extends "base_layouts/base_auth.html" %}
+{% block title %}{{ site_name }} | Alert Webhook Settings{% endblock %}
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h2 class="page-header page-header-title">Alert Webhook Settings</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Configure Webhook Settings to receive alert notifications
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+
+                        {% if msg_success %}
+                            <div class="alert alert-success">{{ msg_success }}</div>
+                        {% endif %}
+
+                        {% if msg_error %}
+                            <div class="alert alert-danger">{{ msg_error }}</div>
+                        {% endif %}
+
+                        <p><strong>Current Alert Webhook URL:</strong></p>
+                        <p style="color: blue; font-size: 16px;">{{ user.user_alert_webhook_url or 'None' }}</p>
+
+                        <hr/>
+
+                        <form method="POST" action="/alert-webhook">
+                            <div class="form-group">
+                                <label>Alert Webhook URL</label>
+                                <input type="url" name="user_alert_webhook_url" class="form-control"
+                                       placeholder="https://hooks.slack.com/services/..."
+                                       value="{{ user.user_alert_webhook_url or '' }}">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </form>
+
+                        <br/>
+                        <div class="alert alert-info">Note: Currently supports default alert notifications 5 days prior to due date and repeat until due date.</div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

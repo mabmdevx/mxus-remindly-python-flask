@@ -1,0 +1,17 @@
+# Config file
+config.yaml
+.env
+
+# Python virtual environment
+.venv
+venv
+
+# Other
+*.pyc
+
+# __pycache__/
+__pycache__/
+app/__pycache__/
+app/helpers/__pycache__/
+app/models/__pycache__/
+app/routes/__pycache__/
