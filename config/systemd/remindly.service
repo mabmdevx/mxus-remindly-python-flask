@@ -1,0 +1,17 @@
+[Unit]
+Description=Gunicorn instance to serve Remindly
+After=network.target
+
+[Service]
+User=remindly
+Group=remindly
+WorkingDirectory=/opt/projects/remindly/mxus-remindly-python-flask/source/
+Environment="PATH=/opt/projects/remindly/mxus-remindly-python-flask/source/.venv/bin"
+ExecStart=/opt/projects/remindly/mxus-remindly-python-flask/source/.venv/bin/gunicorn -c /opt/projects/remindly/mxus-remindly-python-flask/config/gunicorn/gunicorn_config.py app.wsgi:app
+Restart=always
+RestartSec=5
+KillSignal=SIGQUIT
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
