@@ -191,3 +191,9 @@ git pull
 pip install -r requirements.txt
 sudo systemctl restart remindly
 ```
+
+<img
+class="statcounter"
+src="https://c.statcounter.com/13168251/0/bb727728/1/"
+alt="Web Analytics"
+/>
