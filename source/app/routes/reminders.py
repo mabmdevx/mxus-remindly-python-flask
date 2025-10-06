@@ -236,7 +236,7 @@ def create_reminder():
             logger.info("Validation: Reminder Date End must be after Reminder Date Start")
             flash("Reminder Date End must be after Reminder Date Start", "error")
             msg_error = "Reminder Date End must be after Reminder Date Start"
-            return render_template("auth_pages/reminder_form.html", reminder=None, edit_mode=False, msg_error=msg_error)
+            return render_template("auth_pages/reminder_form.html", reminder=None, form_mode="ADD", msg_error=msg_error)
 
         # Check Date Mandatory Behavior
         # If reminder recurrence type is "NONE", "Start Date" is optional, "End Date" is mandatory
@@ -246,13 +246,13 @@ def create_reminder():
                 logger.info("Validation: Reminder Date End is mandatory when Reminder Recurrence Type is NONE")
                 flash("Reminder Date End is mandatory when Reminder Recurrence Type is NONE", "error")
                 msg_error = "Reminder Date End is mandatory when Reminder Recurrence Type is NONE"
-                return render_template("auth_pages/reminder_form.html", reminder=None, edit_mode=False, msg_error=msg_error)
+                return render_template("auth_pages/reminder_form.html", reminder=None, form_mode="ADD", msg_error=msg_error)
         else:
             if not reminder_date_start_processed and reminder_date_end_processed:
                 logger.info("Validation: Reminder Date Start is mandatory when Reminder Recurrence Type is not NONE")
                 flash("Reminder Date Start is mandatory when Reminder Recurrence Type is not NONE", "error")
                 msg_error = "Reminder Date Start is mandatory when Reminder Recurrence Type is not NONE"
-                return render_template("auth_pages/reminder_form.html", reminder=None, edit_mode=False, msg_error=msg_error)
+                return render_template("auth_pages/reminder_form.html", reminder=None, form_mode="ADD", msg_error=msg_error)
 
 
         # For debugging only, hence commented out
@@ -298,7 +298,7 @@ def create_reminder():
         flash("Reminder created successfully!", "success")
         return redirect(url_for("reminders.my_reminders"))
 
-    return render_template("auth_pages/reminder_form.html", reminder=None, edit_mode=False, msg_error=None)
+    return render_template("auth_pages/reminder_form.html", reminder=None, form_mode="Add", msg_error=None)
 
 
 # Update Reminder by reminder_uuid
@@ -363,7 +363,7 @@ def update_reminder(reminder_uuid):
             logger.info("Validation: Reminder Date End must be after Reminder Date Start")
             flash("Reminder Date End must be after Reminder Date Start", "error")
             msg_error = "Reminder Date End must be after Reminder Date Start"
-            return render_template("auth_pages/reminder_form.html", reminder=reminder, edit_mode=True, msg_error=msg_error)
+            return render_template("auth_pages/reminder_form.html", reminder=reminder, form_mode="EDIT", msg_error=msg_error)
 
         # Check Date Mandatory Behavior
         # If reminder recurrence type is "NONE", "Start Date" is optional, "End Date" is mandatory
@@ -373,13 +373,13 @@ def update_reminder(reminder_uuid):
                 logger.info("Validation: Reminder Date End is mandatory when Reminder Recurrence Type is NONE")
                 flash("Reminder Date End is mandatory when Reminder Recurrence Type is NONE", "error")
                 msg_error = "Reminder Date End is mandatory when Reminder Recurrence Type is NONE"
-                return render_template("auth_pages/reminder_form.html", reminder=reminder, edit_mode=True, msg_error=msg_error)
+                return render_template("auth_pages/reminder_form.html", reminder=reminder, form_mode="EDIT", msg_error=msg_error)
         else:
             if not reminder_date_start_processed and reminder_date_end_processed:
                 logger.info("Validation: Reminder Date Start is mandatory when Reminder Recurrence Type is not NONE")
                 flash("Reminder Date Start is mandatory when Reminder Recurrence Type is not NONE", "error")
                 msg_error = "Reminder Date Start is mandatory when Reminder Recurrence Type is not NONE"
-                return render_template("auth_pages/reminder_form.html", reminder=reminder, edit_mode=True, msg_error=msg_error)
+                return render_template("auth_pages/reminder_form.html", reminder=reminder, form_mode="EDIT", msg_error=msg_error)
 
 
         # For debugging only, hence commented out
@@ -417,7 +417,7 @@ def update_reminder(reminder_uuid):
         flash("Reminder updated successfully!", "success")
         return redirect(url_for("reminders.my_reminders"))
 
-    return render_template("auth_pages/reminder_form.html", reminder=reminder, edit_mode=True, msg_error=None)
+    return render_template("auth_pages/reminder_form.html", reminder=reminder, form_mode="EDIT", msg_error=None)
 
 
 # Delete Reminder by reminder_uuid

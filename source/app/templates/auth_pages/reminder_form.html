@@ -27,7 +27,7 @@
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                {{ "Update Reminder" if edit_mode else "Create Reminder" }}
+                {{ "Update Reminder" if form_mode == 'EDIT' else "Create Reminder" }}
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -38,7 +38,7 @@
                     {% endif %}
                     <div class="col-lg-6">
                         <form id="form_reminder" name="form_reminder" role="form" method="post" 
-                            action="{{ '/update-reminder/' + reminder.reminder_uuid if edit_mode else '/create-reminder' }}">
+                            action="{{ '/update-reminder/' + reminder.reminder_uuid if form_mode == 'EDIT' else '/create-reminder' }}">
 
                             <!-- Reminder Title -->
                             <div class="form-group">
@@ -58,11 +58,16 @@
                             <div class="form-group">
                                 <label class="form-label">Link (Optional)</label>
                                 {% if reminder.reminder_link %}
+                                    <input type="text" name="reminder_link" class="form-control" 
+                                        value="{{ reminder.reminder_link if reminder else '' }}" 
+                                        placeholder="Link">
                                     <a href="{{ reminder.reminder_link }}" target="_blank">
-                                        <p class="form-control-static" style="font-size: 16px;">{{ reminder.reminder_link }}</p>
+                                        <i class="fa fa-link"></i> Open Link
                                     </a>
                                 {% else %}
-                                    <p class="form-control-static">N/A</p>
+                                    <input type="text" name="reminder_link" class="form-control" 
+                                        value="{{ reminder.reminder_link if reminder else '' }}" 
+                                        placeholder="Link">
                                 {% endif %}
                             </div>
 
@@ -70,7 +75,7 @@
                             <div class="form-group">
                                 <label class="form-label">Type</label>
                                 <select name="reminder_type" class="form-control" required>
-                                    {% for type in ["Task - Personal", "Task - Home", "Task - Work", "Task - Other", "Event", "Appointment", "Meeting", "Document Validity", "Travel", "Custom Renewal", "Other"] %}
+                                    {% for type in ["Appointment", "Bill", "Custom Renewal", "Document Validity", "Event", "Meeting", "Other", "Task - Home", "Task - Other", "Task - Personal", "Task - Work", "Travel"] %}
                                         <option value="{{ type }}" {% if reminder and reminder.reminder_type == type %}selected{% endif %}>{{ type }}</option>
                                     {% endfor %}
                                 </select>
