@@ -13,7 +13,7 @@
             <div class="panel-body">
                 <div class="table-responsive">
 
-                    <table class="table table-striped table-bordered table-hover" style="margin-bottom:0px;">
+                    <table class="table table-bordered table-hover" style="margin-bottom:0px;">
                         <thead>
                             <tr>
                                 <th>Title</th>
@@ -28,7 +28,7 @@
                         <tbody>
                             {% if my_shared_reminders and my_shared_reminders|length > 0 %}
                                 {% for reminder, shared, user_reminder_shared_with, user_reminder_owner in my_shared_reminders %}
-                                    <tr>
+                                    <tr style="{% if reminder.reminder_is_completed %}background-color: #e2f3dc;{% endif %}">
                                         <td style="{% if reminder.reminder_is_completed %}text-decoration: line-through;{% endif %}">
                                             {{ reminder.reminder_title }}
                                         </td>

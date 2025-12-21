@@ -11,7 +11,7 @@
             </div>
             <div class="panel-body">
                 <div class="table-responsive">
-                    <table class="table table-striped table-bordered table-hover" style="margin-bottom:0px;">
+                    <table class="table table-bordered table-hover" style="margin-bottom:0px;">
                         <thead>
                             <tr>
                                 <th>Title</th>
@@ -28,7 +28,7 @@
                         <tbody>
                             {% if my_reminders and my_reminders|length %}
                                 {% for reminder in my_reminders %}
-                                    <tr>
+                                    <tr style="{{ 'background-color: #e2f3dc;' if reminder.reminder_is_completed else '' }}">
                                         <td style="{{ 'text-decoration: line-through;' if reminder.reminder_is_completed else '' }}">
                                             {{ reminder.reminder_title }}
                                         </td>
