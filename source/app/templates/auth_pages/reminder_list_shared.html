@@ -31,7 +31,7 @@
                         <tbody>
                             {% if my_shared_reminders and my_shared_reminders|length > 0 %}
                                 {% for reminder, shared, user_reminder_shared_with, user_reminder_owner in my_shared_reminders %}
-                                    <tr style="{% if reminder.reminder_is_completed %}background-color: #e2f3dc;{% endif %}">
+                                    <tr class="{{ 'reminder-row-completed' if reminder.reminder_is_completed else '' }}">
                                         <td style="{% if reminder.reminder_is_completed %}text-decoration: line-through;{% endif %}">
                                             {{ reminder.reminder_title }}
                                         </td>

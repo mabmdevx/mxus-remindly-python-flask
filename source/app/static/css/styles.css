@@ -24,6 +24,11 @@
 	display: inline-block;
 }
 
+.table-striped > tbody > tr.reminder-row-completed > td,
+tr.reminder-row-completed > td {
+	background-color: #e2f3dc !important;
+}
+
 fieldset.fieldset_custom {
     border: 1px groove #ddd !important;
     padding: 0 15px 1px 15px !important;

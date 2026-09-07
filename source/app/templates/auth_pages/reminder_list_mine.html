@@ -31,7 +31,7 @@
                         <tbody>
                             {% if my_reminders and my_reminders|length %}
                                 {% for reminder in my_reminders %}
-                                    <tr style="{{ 'background-color: #e2f3dc;' if reminder.reminder_is_completed else '' }}">
+                                    <tr class="{{ 'reminder-row-completed' if reminder.reminder_is_completed else '' }}">
                                         <td style="{{ 'text-decoration: line-through;' if reminder.reminder_is_completed else '' }}">
                                             {{ reminder.reminder_title }}
                                         </td>
