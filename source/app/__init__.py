@@ -44,6 +44,17 @@ def init_app():
             "statcounter_security": app.config["STATCOUNTER_SECURITY"],
         }
 
+    # Cache-busting helper for static assets - appends the file's last modified
+    # timestamp as a query string so browsers fetch fresh copies after deploys
+    @app.template_global()
+    def asset_version(relative_path):
+        static_file_path = os.path.join(app.static_folder, relative_path)
+        try:
+            return int(os.path.getmtime(static_file_path))
+        except OSError:
+            logger.warning("Could not stat static asset for cache-busting: %s", relative_path)
+            return 0
+
     # Register blueprints
     from .routes.auth import auth_bp
     app.register_blueprint(auth_bp)
