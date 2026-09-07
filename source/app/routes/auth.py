@@ -26,6 +26,7 @@ def login():
     if request.method == "POST":
         user_username = request.form.get("user_username")
         user_password = request.form.get("user_password")
+        remember_me = request.form.get("remember_me")
 
         logger.debug("Username: %s", user_username)
 
@@ -37,6 +38,7 @@ def login():
 
             if user and bcrypt.check_password_hash(user.user_password, user_password):
 
+                session.permanent = bool(remember_me)
                 session["user_id"] = user.user_id
                 session["user_uuid"] = user.user_uuid
                 session["user_username"] = user.user_username

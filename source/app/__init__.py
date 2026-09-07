@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_bcrypt import Bcrypt
 from app.helpers.logging import setup_logger
 from app.helpers.db import get_db_connection_string
@@ -22,6 +22,7 @@ def init_app():
     logger.info("Loading environment variables...")
     app.config["SITE_NAME"] = os.getenv("APP_NAME", "Remindly")
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev_secret")  # for sessions
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=int(os.getenv("REMEMBER_ME_DAYS", 30)))
     app.config["SQLALCHEMY_DATABASE_URI"] = get_db_connection_string()
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["STATCOUNTER_PROJECT"] = os.getenv("STATCOUNTER_PROJECT")
