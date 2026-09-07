@@ -5,9 +5,12 @@
 <div class="row">
     <div class="col-lg-12">
         <h2 class="page-header page-header-title">My Reminders</h2>
+
+        {% include "partials/reminder_tabs.html" %}
+
         <div class="panel panel-default">
             <div class="panel-heading">
-                My Reminders
+                My Reminders - {{ active_tab | capitalize }}
             </div>
             <div class="panel-body">
                 <div class="table-responsive">

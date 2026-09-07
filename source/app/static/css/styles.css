@@ -6,6 +6,24 @@
 	color:#339900;
 }
 
+.reminder-tabs-scroll {
+	overflow-x: auto;
+	overflow-y: hidden;
+	-webkit-overflow-scrolling: touch;
+	white-space: nowrap;
+}
+
+.reminder-tabs-nowrap {
+	display: flex;
+	flex-wrap: nowrap;
+	white-space: nowrap;
+}
+
+.reminder-tabs-nowrap > li {
+	float: none;
+	display: inline-block;
+}
+
 fieldset.fieldset_custom {
     border: 1px groove #ddd !important;
     padding: 0 15px 1px 15px !important;

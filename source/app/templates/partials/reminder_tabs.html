@@ -1,0 +1,22 @@
+<div class="reminder-tabs-scroll">
+{% set tabs_endpoint = 'reminders.reminders_shared_with_me' if tab_context == 'shared_with_me' else 'reminders.my_reminders' %}
+<ul class="nav nav-tabs reminder-tabs-nowrap" style="margin-bottom: 20px;">
+    <li class="{{ 'active' if active_tab == 'open' else '' }}">
+        <a href="{{ url_for(tabs_endpoint, tab='open') }}">Open</a>
+    </li>
+    <li class="{{ 'active' if active_tab == 'completed' else '' }}">
+        <a href="{{ url_for(tabs_endpoint, tab='completed') }}">Completed</a>
+    </li>
+    <li class="{{ 'active' if active_tab == 'recurring' else '' }}">
+        <a href="{{ url_for(tabs_endpoint, tab='recurring') }}">Recurring</a>
+    </li>
+    {% if tab_context != 'shared_with_me' %}
+    <li class="{{ 'active' if active_tab == 'shared' else '' }}">
+        <a href="{{ url_for('reminders.my_reminders', tab='shared') }}">Shared</a>
+    </li>
+    {% endif %}
+    <li class="{{ 'active' if active_tab == 'all' else '' }}">
+        <a href="{{ url_for(tabs_endpoint, tab='all') }}">All</a>
+    </li>
+</ul>
+</div>

@@ -72,12 +72,27 @@ def my_reminders():
         return check_login_result
     else:
         session_user_uuid = check_login_result
-    
+
+    # Active tab - Open | Completed | Recurring | Shared | All
+    active_tab = request.args.get("tab", "open")
+    if active_tab not in ("open", "completed", "recurring", "shared", "all"):
+        active_tab = "open"
+
     # Get reminders that belong to the logged-in user
-    my_reminders = Reminder.query.filter_by(
+    reminders_query = Reminder.query.filter_by(
         reminder_user_uuid=session_user_uuid,
         is_deleted=False
-    ).order_by(Reminder.reminder_date_start).all()
+    )
+
+    if active_tab == "open":
+        reminders_query = reminders_query.filter_by(reminder_is_completed=False)
+    elif active_tab == "completed":
+        reminders_query = reminders_query.filter_by(reminder_is_completed=True)
+    elif active_tab == "recurring":
+        reminders_query = reminders_query.filter(Reminder.reminder_recurrence_type != "NONE")
+    # "shared" and "all" - no additional DB-level filter (shared is filtered after computing dynamic properties)
+
+    my_reminders = reminders_query.order_by(Reminder.reminder_date_start).all()
 
 
     # Add dynamic properties
@@ -106,14 +121,19 @@ def my_reminders():
 
         reminder.reminder_display_date_next_occurrence = reminder_display_date_next_occurrence
         reminder.reminder_sort_date_next_occurrence = reminder_sort_date_next_occurrence
-    
+
+    # Filter for the Shared tab - only reminders that have been shared with someone
+    if active_tab == "shared":
+        my_reminders = [reminder for reminder in my_reminders if reminder.reminder_is_shared]
 
     # Sort by next occurrence
     my_reminders = sorted(my_reminders, key=lambda x: x.reminder_sort_date_next_occurrence)
 
     return render_template(
         "auth_pages/reminder_list_mine.html",
-        my_reminders=my_reminders
+        my_reminders=my_reminders,
+        active_tab=active_tab,
+        tab_context="mine"
     )
 
 
@@ -128,12 +148,17 @@ def reminders_shared_with_me():
     else:
         session_user_uuid = check_login_result
 
+    # Active tab - Open | Completed | Recurring | All
+    active_tab = request.args.get("tab", "open")
+    if active_tab not in ("open", "completed", "recurring", "all"):
+        active_tab = "open"
+
     # Aliases for User table
     user_reminder_shared_with = aliased(User)
     user_reminder_owner = aliased(User)
     
     # Get reminders that are shared with the logged-in user
-    my_shared_reminders = (
+    shared_reminders_query = (
         db.session.query(Reminder, SharedReminder, user_reminder_shared_with, user_reminder_owner)
             # Join shared reminder
             .join(SharedReminder, SharedReminder.shared_reminder_reminder_uuid == Reminder.reminder_uuid)
@@ -148,9 +173,17 @@ def reminders_shared_with_me():
                 user_reminder_shared_with.is_deleted == False,
                 user_reminder_owner.is_deleted == False
             )
-            .order_by(Reminder.reminder_date_start)
-            .all()
     )
+
+    if active_tab == "open":
+        shared_reminders_query = shared_reminders_query.filter(Reminder.reminder_is_completed == False)
+    elif active_tab == "completed":
+        shared_reminders_query = shared_reminders_query.filter(Reminder.reminder_is_completed == True)
+    elif active_tab == "recurring":
+        shared_reminders_query = shared_reminders_query.filter(Reminder.reminder_recurrence_type != "NONE")
+    # "all" - no additional filter
+
+    my_shared_reminders = shared_reminders_query.order_by(Reminder.reminder_date_start).all()
 
     # For debugging only, hence commented out
     """
@@ -192,7 +225,12 @@ def reminders_shared_with_me():
     # Sort by next occurrence
     my_shared_reminders = sorted(my_shared_reminders, key=lambda x: x[0].reminder_sort_date_next_occurrence)
 
-    return render_template("auth_pages/reminder_list_shared.html", my_shared_reminders=my_shared_reminders)
+    return render_template(
+        "auth_pages/reminder_list_shared.html",
+        my_shared_reminders=my_shared_reminders,
+        active_tab=active_tab,
+        tab_context="shared_with_me"
+    )
 
 
 # Create Reminder
