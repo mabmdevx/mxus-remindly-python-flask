@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from flask_bcrypt import Bcrypt
 from app.helpers.logging import setup_logger
 from app.helpers.db import get_db_connection_string
@@ -42,6 +42,7 @@ def init_app():
             "current_year": datetime.now().year,
             "statcounter_project": app.config["STATCOUNTER_PROJECT"],
             "statcounter_security": app.config["STATCOUNTER_SECURITY"],
+            "today": date.today(),
         }
 
     # Cache-busting helper for static assets - appends the file's last modified

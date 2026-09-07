@@ -30,7 +30,15 @@
                         </thead>
                         <tbody>
                             {% if my_reminders and my_reminders|length %}
+                                {% set ns = namespace(divider_shown=false, prev_date=none) %}
                                 {% for reminder in my_reminders %}
+                                    {% if not ns.divider_shown and ns.prev_date is not none and ns.prev_date < today and reminder.reminder_sort_date_next_occurrence >= today %}
+                                        <tr class="reminder-row-divider">
+                                            <td colspan="9"><i class="fa fa-arrow-down"></i>&nbsp;Today &amp; Upcoming</td>
+                                        </tr>
+                                        {% set ns.divider_shown = true %}
+                                    {% endif %}
+                                    {% set ns.prev_date = reminder.reminder_sort_date_next_occurrence %}
                                     <tr class="{{ 'reminder-row-completed' if reminder.reminder_is_completed else '' }}">
                                         <td style="{{ 'text-decoration: line-through;' if reminder.reminder_is_completed else '' }}">
                                             {{ reminder.reminder_title }}

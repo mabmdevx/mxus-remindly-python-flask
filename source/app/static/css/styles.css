@@ -24,6 +24,16 @@
 	display: inline-block;
 }
 
+.reminder-row-divider > td {
+	background-color: #f5f5f5 !important;
+	border-top: 2px solid #999 !important;
+	border-bottom: 2px solid #999 !important;
+	font-weight: bold;
+	color: #666;
+	padding-top: 6px !important;
+	padding-bottom: 6px !important;
+}
+
 .table-striped > tbody > tr.reminder-row-completed > td,
 tr.reminder-row-completed > td {
 	background-color: #e2f3dc !important;
