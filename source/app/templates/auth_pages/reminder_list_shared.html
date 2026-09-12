@@ -34,7 +34,7 @@
                                 {% for reminder, shared, user_reminder_shared_with, user_reminder_owner in my_shared_reminders %}
                                     {% if not ns.divider_shown and ns.prev_date is not none and ns.prev_date < today and reminder.reminder_sort_date_next_occurrence >= today %}
                                         <tr class="reminder-row-divider">
-                                            <td colspan="7"><i class="fa fa-arrow-down"></i>&nbsp;Today &amp; Upcoming</td>
+                                            <td colspan="7"><i class="fa fa-arrow-down"></i>&nbsp;Upcoming</td>
                                         </tr>
                                         {% set ns.divider_shown = true %}
                                     {% endif %}
